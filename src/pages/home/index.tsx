@@ -1,30 +1,91 @@
-import { useState } from 'react'
-
-import reactLogo from '@/assets/react.svg'
-import viteLogo from '/vite.svg'
+import { EditFormItem, EditFormTable } from '@/components/form-module'
+import { useTable } from '@/hooks'
 import './index.scoped.scss'
-
 const HomeApp = () => {
-	const [count, setCount] = useState(0)
-	console.log('home--')
+	const [form] = AForm.useForm()
+
+	const forms = [
+		{
+			name: 'name',
+			label: '姓名',
+			type: 'Input',
+			rules: [{ required: true, message: '请输入姓名' }]
+		},
+		{
+			name: 'sex',
+			label: '性别',
+			type: 'Select',
+			rules: [{ required: true, message: '请选择性别' }],
+			options: [
+				{
+					label: '男',
+					value: '1'
+				},
+				{
+					label: '女',
+					value: '2'
+				}
+			]
+		}
+	]
+	const tableForms = [
+		{
+			title: '姓名',
+			dataIndex: 'uname',
+			type: 'Input'
+		},
+		{
+			title: '性别',
+			dataIndex: 'sex',
+			type: 'Select',
+			options: [
+				{
+					label: '男',
+					value: '1'
+				},
+				{
+					label: '女',
+					value: '2'
+				}
+			]
+		}
+	]
+	const tableRef = useRef<any>(null)
+	const x = useTable(tableForms, [], {
+		prefix: 'search'
+	})
+	console.log('useTable', x)
 	return (
-		<div className="home">
-			<div>
-				<a href="https://vite.dev" target="_blank">
-					<img src={viteLogo} className="logo" alt="Vite logo" />
-				</a>
-				<a href="https://react.dev" target="_blank">
-					<img src={reactLogo} className="logo react" alt="React logo" />
-				</a>
-			</div>
-			<h1>Vite + React</h1>
-			<div className="card">
-				<AButton onClick={() => setCount((count) => count + 1)}>count is {count}</AButton>
-				<p>
-					Edit <code>src/App.tsx</code> and save to test HMR
-				</p>
-			</div>
-			<p className="read-the-docs">Click on the Vite and React logos to learn more</p>
+		<div className="form-module-box">
+			<AButton
+				onClick={() => {
+					console.log(form.getFieldsValue())
+				}}
+			>
+				X
+			</AButton>
+			<AForm form={form} requiredMark>
+				<div>
+					<EditFormItem forms={forms} form={form} />
+				</div>
+				<div>
+					<EditFormTable
+						ref={tableRef}
+						form={form}
+						formName="editTable"
+						rowKey={'uname'}
+						columns={tableForms}
+						data={[
+							{
+								key: '1',
+								uname: '张三',
+								age: 18,
+								sex: '1'
+							}
+						]}
+					/>
+				</div>
+			</AForm>
 		</div>
 	)
 }

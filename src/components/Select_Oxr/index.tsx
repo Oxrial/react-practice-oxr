@@ -1,29 +1,23 @@
 import React, { useState, useEffect, useRef } from 'react'
 import { pick, omit } from 'lodash-es'
 import { Select as ASelect } from 'antd'
+import type { SelectOxrProps } from './types'
 
 const Select_Oxr = ({
 	options = [],
 	fieldNames = { label: 'label', value: 'value' },
 	optionClassName = '',
 	rightRender,
-	allowCreate = false, // 新增：允许创建新项
+	allowCreate = false,
 	mode,
+	value,
+	onChange,
 	...rest
-}: {
-	options: Record<string, any>[]
-	fieldNames?: { label: string | string[]; value: string }
-	optionClassName?: string
-	rightRender?: (option: Record<string, any>) => React.ReactNode
-	allowCreate?: boolean
-	mode?: 'multiple' | 'tags'
-	[key: string]: any
-}) => {
+}: SelectOxrProps) => {
 	const oLabel = Array.isArray(fieldNames.label) ? fieldNames.label : [fieldNames.label]
 	const oValue = fieldNames.value
 	const [innerOptions, setInnerOptions] = useState(options)
 	const [searchValue, setSearchValue] = useState('')
-	const [value, setValue] = useState<any>(rest.value ?? (mode === 'multiple' ? [] : undefined))
 	const inputRef = useRef<any>(null)
 	const isComposingRef = useRef(false)
 
@@ -31,8 +25,11 @@ const Select_Oxr = ({
 		setInnerOptions(options)
 	}, [options])
 
-	// 修复中文输入法搜索
+	// 保证受控 value 与表单同步
+	// 不再维护内部 value 状态，直接用 props.value
+
 	const innerOnSearch = (val: string) => {
+		console.log('onSearch', val, isComposingRef.current)
 		setSearchValue(val)
 		if (!isComposingRef.current && 'onSearch' in rest) {
 			rest.onSearch(val, setInnerOptions)
@@ -47,14 +44,11 @@ const Select_Oxr = ({
 	const handleFocus = (e: React.FocusEvent<HTMLInputElement>) => {
 		const input = e.target as HTMLInputElement
 		if (input && !inputRef.current) {
-			inputRef.current = input
 			input.addEventListener('compositionstart', start)
 			input.addEventListener('compositionend', end)
-			input.addEventListener('input', () => {
-				if (!isComposingRef.current) {
-					innerOnSearch(input.value)
-				}
-			})
+			// 将ref赋值为当前input元素，防止onsearch的键入覆盖
+			// abc异常接接收为a b c，保证为a ab abc
+			inputRef.current = input
 		}
 	}
 	const handleBlur = () => {
@@ -79,7 +73,9 @@ const Select_Oxr = ({
 		) {
 			const newOption = { [oValue]: searchValue, [oLabel[0]]: searchValue }
 			setInnerOptions([...innerOptions, newOption])
-			setValue((prev: any[]) => [...(prev || []), searchValue])
+			// 直接同步到表单
+			const newValue = Array.isArray(value) ? [...value, searchValue] : [searchValue]
+			onChange?.(newValue)
 			setSearchValue('')
 			e.preventDefault()
 		}
@@ -119,8 +115,7 @@ const Select_Oxr = ({
 			onBlur={handleBlur}
 			mode={mode}
 			value={value}
-			onChange={setValue}
-			// 关键：通过 dropdownRender 拿到 input dom，绑定 onKeyDown
+			onChange={onChange}
 			dropdownRender={(menu) => <div onKeyDown={handleInputKeyDown}>{menu}</div>}
 		>
 			{selectOptions.map((op, index) => (

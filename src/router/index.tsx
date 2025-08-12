@@ -4,7 +4,7 @@ import Home from '@/pages/home'
 const routes = [
 	{
 		path: '/',
-		element: <Navigate to="/login" replace />
+		element: <Navigate to="/home" replace />
 	},
 	{
 		path: '/login',

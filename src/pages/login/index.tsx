@@ -1,7 +1,5 @@
 import { MouseEventHandler, useState } from 'react'
 import './index.scoped.scss'
-
-import COMPONENTS from '@/components/index.tsx'
 function Square({ value, onSquareClick }: { value: string; onSquareClick: MouseEventHandler }) {
 	return (
 		<button className="square" onClick={onSquareClick}>
@@ -94,20 +92,6 @@ export default function Game() {
 
 	return (
 		<div className="game">
-			<div style={{ width: '300px' }}>
-				{COMPONENTS.Select({
-					$attrs: {
-						style: { width: '100%' },
-						mode: 'multiple',
-						allowCreate: true,
-						onSearch: (value: string) => console.log(value),
-						options: [
-							{ label: 'Option 1', value: '1' },
-							{ label: 'Option 2', value: '2' }
-						]
-					}
-				})}
-			</div>
 			<div className="game-board">
 				<Board xIsNext={xIsNext} squares={currentSquares} onPlay={handlePlay} />
 			</div>

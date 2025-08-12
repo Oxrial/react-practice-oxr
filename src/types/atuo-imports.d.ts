@@ -7,8 +7,9 @@
 export {}
 declare global {
   const AButton: typeof import('antd')['Button']
+  const AForm: typeof import('antd')['Form']
   const AInput: typeof import('antd')['Input']
-  const ASelect: typeof import('antd')['Select']
+  const AModal: typeof import('antd')['Modal']
   const Link: typeof import('react-router-dom')['Link']
   const NavLink: typeof import('react-router-dom')['NavLink']
   const Navigate: typeof import('react-router-dom')['Navigate']
